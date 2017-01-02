@@ -1,0 +1,40 @@
+nav.nav ul {
+	list-style: none;
+}
+
+nav.nav ul li {
+	position: relative;
+	float: left;
+	margin-right: 10px;
+	padding: 3px;
+}
+
+nav.nav ul li:hover {
+	background: #eee;
+}
+
+nav ul li a {
+	text-decoration: none;
+	color: black;
+}
+
+.submenu {
+	display: none;
+ 	position: absolute;
+	top: 100%;
+	left:0;
+	padding: 0;
+}
+
+.submenu li {
+	clear: both;
+}
+
+.submenu a {
+	line-height:120%;
+	padding:10px 15px
+}
+
+nav.nav ul li:hover > ul {
+	display: block;
+}

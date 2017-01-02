@@ -1,4 +1,30 @@
 <?php
+
+/*
+
+    Support functions for Homework 2.
+
+    Todo:
+
+        1. Refactoring.
+        2. Decide whether array tables will reside in the functions
+        here they are used or as a constant global one in lib namespace
+        3. Fix several bugs
+        4. More testing for incorrect input type values, boundary values.
+*/
+
+/*
+    Calculates sum, multiplication or subtraction depending
+    on input arguments.
+
+    a and b >= 0 ==> -
+    a and b < 0 ==> *
+    otherwise ==> +
+
+    if $return is true, return operation result as a string,
+    otherwise display the result on console (default)  
+
+*/
 function funny_calculator($a, $b, $return = false) {
 
     if ( $a >= 0 && $b >= 0 )
@@ -15,16 +41,20 @@ function funny_calculator($a, $b, $return = false) {
 
 }
 
-/*funny_calculator(5, 6);
-echo( "\n" . funny_calculator(5, 6, true) . "\n");
 
-funny_calculator(0, 0);
-funny_calculator(-2, -4);
-funny_calculator(-2, 4);*/
+/*
+    Prints the range from lower boundary
+    to the upper one (hardcoded 15).
 
-/*echo "\n";*/
+    if input low boundary will be > 15
+    prints -1 (minus one);
+*/
+define('MAX_UPPER_VALUE', 15);
 
 function rand_start_range($low) {
+    if ($low > MAX_UPPER_VALUE)
+        echo '-1';
+
     switch($low) {
         case 0: echo '0 ';
         case 1: echo '1 ';
@@ -44,9 +74,6 @@ function rand_start_range($low) {
         case 15: echo '15';
     }
 }
-
-/*rand_start_range( rand(0, 15) );*/
-
 
 
 function sum($a, $b) {
@@ -69,6 +96,16 @@ function div($a, $b) {
 
 }
 
+/*
+    Calculator:
+        upported operations: +, -, *, /
+
+    if divisor is 0, print error message and
+    return 0;
+
+    Note: uses helper functions: sum(), sub(), mult(), div();
+            div() returns null if divisor is 0;
+*/
 function calculator($arg1, $arg2, $operation) {
     switch($operation) {
         case '+':
@@ -79,24 +116,21 @@ function calculator($arg1, $arg2, $operation) {
             return mult($arg1, $arg2);
         case '/':
             if ($arg2 == 0) {
-                echo "Error: division by zero.\n";
+                echo "Error: division by zero";
                 return 0;
             }
             return div($arg1, $arg2);
         default:
-            echo "Error: Unknown operation '$operation'\n";
+            echo "Error: Unknown operation '$operation'";
             return 0;
     }
 }
 
-/*echo "\n";
-echo(calculator(5, 2, '+'));
-echo(calculator(5, 2, '-'));
-echo(calculator(5, 2, '*'));
-echo(calculator(5, 2, '/'));
-echo(calculator(5, 0, '/'));
-echo(calculator(5, 0, '**'));*/
+/*
+    Calculates power of value.
 
+    Supports negative values.
+*/
 function power($val, $pow) {
     if ($pow == 0)
         return 1;
@@ -111,8 +145,6 @@ function power($val, $pow) {
 
     return $val * power($val, $pow - 1);
 }
-
-/*echo "\n" . power(2, 3) . "\n";*/
 
 $cyrillic_to_latin_map = [
     "А" =>  "A",
@@ -150,6 +182,15 @@ $cyrillic_to_latin_map = [
     "Я" =>  "IA"
 ];
 
+
+/*
+    Transliterates an input text depending on
+    input transliterate table.
+
+    Note: mbstring extension should be installed and
+    enabled for PHP on the server.
+
+*/
 function transliterate($text, &$map) {
     
     $text = mb_strtoupper($text);
@@ -161,19 +202,13 @@ function transliterate($text, &$map) {
     return $result;
 }
 
-$text = 'Сергей';
-$res =  transliterate($text, $cyrillic_to_latin_map);
-echo $text . ' ==> ' . $res;
+/*
+    Depending on value and type, prints time unit
+    with correct conjugation.
 
-function print_time( $timezone_identifier ) {
-
-    date_default_timezone_set('Europe/Moscow');
-    print_r(localtime(time(), true));
-
-}
-
-print_time('Europe/Moscow');
-
+    TODO: might be time_units_from will be more
+            suitable func name.
+*/
 function time_units_to_words($val, $t = 'H') {
 
     $type = [
@@ -194,32 +229,23 @@ function time_units_to_words($val, $t = 'H') {
 
 }
 
-$month = [
-    [ 'Январь',  'Января'   ],
-    [ 'Февраль', 'Февраля'  ],
-    [ 'Март',    'Марта'    ],
-    [ 'Апрель',  'Апреля'   ],
-    [ 'Май',     'Мая'      ],
-    [ 'Июнь',    'Июня'     ],
-    [ 'Июль',    'Июля'     ],
-    [ 'Август',  'Августа'  ],
-    [ 'Сентябрь','Сентября' ],
-    [ 'Октябрь', 'Октября'  ],
-    [ 'Ноябрь',  'Ноября'   ],
-    [ 'Декабрь', 'Декабря'  ],
-];
+/* 
 
-$week = [
-    'Понедельник',
-    'Вторник',
-    'Среда',
-    'Четверг',
-    'Пятница',
-    'Субота',
-    'Воскресенье',
-];
+    Returns value's word representation.
+    Values till 1000 only supported in initial version.
 
+    Todo:
+        Fix a bug in tens at specific value.
+        Add support > 999
+        Cleaner code
+*/
 function number_to_word($val) {
+
+    if ($val > 999) {
+        echo 'Warning: values till 1000 only supported in initial version.';
+        $val %= 100; // for now only process starting from hundreds
+    }
+
     $ones = [
         'ноль',
         'один',
@@ -279,6 +305,8 @@ function number_to_word($val) {
 
     $val %= 100;
     if (floor($val / 10) != 0) {
+        if (strlen($res) != 0)
+            $res .= ' ';
         if (floor($val / 10) == 1) {
             $res .= $tens[ $val % 10 - 1 ];
             return $res;
@@ -289,6 +317,8 @@ function number_to_word($val) {
 
     $val %= 10;
     if ($val != 0) {
+        if (strlen($res) != 0)
+            $res .= ' ';
         $res .= $ones[ $val ];
     }
 
@@ -296,8 +326,48 @@ function number_to_word($val) {
 }
 
 
-for ($i = 0; $i < 40; ++$i) echo "\n" . $i . time_units_to_words($i, 'M') . "\n";
+/*
+    returns the date string in words representation (almost)
+    depending on timezone specified.
 
-for ($i = 99; $i < 125; ++$i) echo "\n" . number_to_word($i) . "\n";
+    Todo:
+        Fix conjugation bug for 'one' and 'two'
+        Cleaner code 
+*/
+function get_date_in_russian( $timezone_identifier ) {
+    $month = [
+        [ 'Январь',  'Января'   ],
+        [ 'Февраль', 'Февраля'  ],
+        [ 'Март',    'Марта'    ],
+        [ 'Апрель',  'Апреля'   ],
+        [ 'Май',     'Мая'      ],
+        [ 'Июнь',    'Июня'     ],
+        [ 'Июль',    'Июля'     ],
+        [ 'Август',  'Августа'  ],
+        [ 'Сентябрь','Сентября' ],
+        [ 'Октябрь', 'Октября'  ],
+        [ 'Ноябрь',  'Ноября'   ],
+        [ 'Декабрь', 'Декабря'  ],
+    ];
 
+    $week = [
+        'Понедельник',
+        'Вторник',
+        'Среда',
+        'Четверг',
+        'Пятница',
+        'Субота',
+        'Воскресенье',
+    ];
+
+    date_default_timezone_set($timezone_identifier);
+    $time = localtime(time(), true);
+
+    $date = '';
+    $date .= $time[ 'tm_mday' ] . ' ' . $month[ $time['tm_mon'] ][1] . ' ' . date('Y') . '.';
+    $date .= ' ' . $week[ $time['tm_wday'] ] . '.';
+    $date .= ' Время: ' . number_to_word($time[ 'tm_hour' ]) . ' ' . time_units_to_words($time[ 'tm_hour' ]) . ' ' . number_to_word($time[ 'tm_min' ]) . ' ' . time_units_to_words($time[ 'tm_min' ], 'M') . ' ' . number_to_word($time[ 'tm_sec' ]) . ' ' . time_units_to_words($time[ 'tm_sec' ], 'S');
+
+    return $date;
+}
 ?>
